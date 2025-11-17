@@ -1,0 +1,5 @@
+{
+  "name": "マーケットインサイトリサーチAI",
+  "description": "An application that uses Gemini's web search capabilities to perform a multi-layered analysis of a given theme, covering customer psychology, market structure, competitors, and unmet needs. Output is available in HTML and Markdown.",
+  "requestFramePermissions": []
+}
