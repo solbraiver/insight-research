@@ -1,4 +1,5 @@
-import { GoogleGenAI } from "@google/genai";
+import { NextRequest, NextResponse } from 'next/server';
+import { GoogleGenAI } from '@google/genai';
 
 const SYSTEM_INSTRUCTION = `あなたは「マーケット・インサイト・アナリスト」です。
 Web検索機能を用いて、指定されたテーマについて、実際のWeb検索結果に基づいた分析レポートを作成してください。
@@ -49,28 +50,43 @@ Web検索機能を用いて、指定されたテーマについて、実際のWe
 - [記事タイトル3](URL3)
 `;
 
-export const analyzeTheme = async (theme: string): Promise<string> => {
-  if (!process.env.API_KEY) {
-    throw new Error("APIキーが設定されていません。");
-  }
-
+export async function POST(request: NextRequest) {
   try {
-    const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+    const { theme } = await request.json();
 
+    if (!theme || typeof theme !== 'string') {
+      return NextResponse.json(
+        { error: '調査テーマが必要です。' },
+        { status: 400 }
+      );
+    }
+
+    const apiKey = process.env.GEMINI_API_KEY;
+    if (!apiKey) {
+      return NextResponse.json(
+        { error: 'APIキーが設定されていません。' },
+        { status: 500 }
+      );
+    }
+
+    const ai = new GoogleGenAI({ apiKey });
     const finalSystemInstruction = SYSTEM_INSTRUCTION.replace('{USER_INPUT}', theme);
-    
+
     const response = await ai.models.generateContent({
-        model: "gemini-2.5-flash",
-        contents: [{ role: 'user', parts: [{text: theme}] }],
-        config: {
-            systemInstruction: finalSystemInstruction,
-            tools: [{googleSearch: {}}],
-        },
+      model: 'gemini-2.5-flash',
+      contents: [{ role: 'user', parts: [{ text: theme }] }],
+      config: {
+        systemInstruction: finalSystemInstruction,
+        tools: [{ googleSearch: {} }],
+      },
     });
 
-    return response.text;
+    return NextResponse.json({ result: response.text });
   } catch (error) {
-    console.error("Gemini API request failed:", error);
-    throw new Error("Gemini APIとの通信に失敗しました。キーまたは設定を確認してください。");
+    console.error('Gemini API request failed:', error);
+    return NextResponse.json(
+      { error: 'Gemini APIとの通信に失敗しました。' },
+      { status: 500 }
+    );
   }
-};
+}

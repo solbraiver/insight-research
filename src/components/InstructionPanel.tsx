@@ -1,6 +1,12 @@
-import React from 'react';
-
-const Section: React.FC<{ title: string; icon: string; children: React.ReactNode }> = ({ title, icon, children }) => (
+const Section = ({
+  title,
+  icon,
+  children,
+}: {
+  title: string;
+  icon: string;
+  children: React.ReactNode;
+}) => (
   <div className="bg-white p-6 rounded-2xl shadow-lg">
     <h2 className="text-xl font-bold mb-4 flex items-center text-gray-800">
       <span className="mr-3 text-2xl">{icon}</span>
@@ -10,18 +16,18 @@ const Section: React.FC<{ title: string; icon: string; children: React.ReactNode
   </div>
 );
 
-const Preformatted: React.FC<{ children: React.ReactNode }> = ({ children }) => (
+const Preformatted = ({ children }: { children: React.ReactNode }) => (
   <pre className="bg-gray-50 p-4 rounded-md whitespace-pre-wrap text-sm text-gray-700 font-mono overflow-x-auto">
     {children}
   </pre>
 );
 
-export const InstructionPanel: React.FC = () => {
+export const InstructionPanel = () => {
   return (
     <div className="space-y-6">
       <Section title="入力欄テンプレート" icon="💬">
         <Preformatted>
-{`調査したいテーマを1文で入力してください。
+          {`調査したいテーマを1文で入力してください。
 例：
 ・「IT活用を進めたい個人事業主・フリーランスの悩みや課題」
 ・「美容サロンがリピート率を上げられない理由」
